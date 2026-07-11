@@ -44,8 +44,7 @@ const schemaData = {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Google Analytics Integration Fix -->
-    <!-- Google tag (gtag.js) -->
+    <!-- Google Analytics Integration -->
     <script async src="https://googletagmanager.com"></script>
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
@@ -60,23 +59,115 @@ const schemaData = {
     <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
 
     <style>
-        body { font-family: system-ui, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; background: #fafafa; }
-        main { background: #ffffff; border: 1px solid #e2e8f0; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        main h1 { font-size: 2rem; color: #0f172a; margin-top: 0; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
-        main h2 { font-size: 1.3rem; color: #1e293b; margin-top: 30px; }
-        main p { font-size: 1.05rem; color: #475569; }
-        main ul { background: #f8fafc; padding: 20px 40px; border-radius: 8px; border-left: 4px solid #3b82f6; }
-        main li { margin-bottom: 8px; font-size: 1rem; color: #334155; }
-        .listings-section { margin-top: 40px; }
-        .business-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .biz-info h3 { margin: 0 0 5px 0; color: #1e3a8a; font-size: 1.2rem; }
-        .badge { background: #dcfce7; color: #15803d; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-left: 10px; display: inline-block; vertical-align: middle; }
-        .stars { color: #f59e0b; font-weight: bold; font-size: 0.95rem; }
-        .reviews-count { color: #64748b; font-size: 0.85rem; }
-        .call-btn { display: inline-block; background: #2563eb; color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; transition: background 0.15s; }
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --text-main: #475569;
+            --text-dark: #0f172a;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+        }
+        body { 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; 
+            line-height: 1.6; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            color: var(--text-main); 
+            background: var(--bg-main); 
+        }
+        main { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border); 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); 
+        }
+        main h1 { 
+            font-size: 2.25rem; 
+            font-weight: 800;
+            color: var(--text-dark); 
+            margin-top: 0; 
+            padding-bottom: 20px; 
+            border-bottom: 2px solid #f1f5f9; 
+            letter-spacing: -0.025em;
+        }
+        main h2 { 
+            font-size: 1.4rem; 
+            font-weight: 700;
+            color: var(--text-dark); 
+            margin-top: 35px; 
+            margin-bottom: 15px;
+        }
+        main p { font-size: 1.05rem; color: var(--text-main); }
+        main ul { 
+            background: #f8fafc; 
+            padding: 24px 24px 24px 40px; 
+            border-radius: 10px; 
+            border-left: 4px solid var(--accent); 
+            margin: 20px 0;
+        }
+        main li { margin-bottom: 10px; font-size: 1rem; color: #334155; }
+        
+        .listings-section { margin-top: 45px; }
+        .business-card { 
+            background: #ffffff; 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 24px; 
+            margin-bottom: 16px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+            transition: border-color 0.15s;
+        }
+        .business-card:hover {
+            border-color: #cbd5e1;
+        }
+        .biz-info h3 { margin: 0 0 6px 0; color: var(--text-dark); font-size: 1.25rem; font-weight: 700; }
+        .badge { 
+            background: #dcfce7; 
+            color: #166534; 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+            padding: 4px 10px; 
+            border-radius: 9999px; 
+            margin-left: 10px; 
+            display: inline-block; 
+            vertical-align: middle; 
+            letter-spacing: 0.025em;
+        }
+        .stars { color: #eab308; font-weight: 700; font-size: 1rem; }
+        .reviews-count { color: #64748b; font-size: 0.85rem; margin-left: 4px; }
+        
+        .call-btn { 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2563eb; 
+            color: #fff; 
+            text-decoration: none; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            transition: background 0.15s; 
+            white-space: nowrap;
+        }
         .call-btn:hover { background: #1d4ed8; }
-        .back-link { display: inline-block; margin-top: 35px; color: #2563eb; text-decoration: none; font-weight: 500; }
-        .back-link:hover { text-decoration: underline; }
+        
+        .back-link { 
+            display: inline-block; 
+            margin-top: 35px; 
+            color: var(--accent); 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 1rem;
+        }
+        .back-link:hover { color: var(--accent-hover); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -94,19 +185,21 @@ const schemaData = {
                                 {biz.name}
                                 {biz.vetted && <span class="badge">🛡️ VETTED PRO</span>}
                             </h3>
-                            <p style="margin: 0;">
+                            <p style="margin: 0; display: flex; align-items: center;">
                                 <span class="stars">★ {biz.rating}</span> 
-                                <span class="reviews-count">({biz.reviews} reviews)</span>
+                                <span class="reviews-count">({biz.reviews} verified reviews)</span>
                             </p>
                         </div>
-                        <a href={`tel:${biz.phone}`} class="call-btn">📞 Call {biz.phone}</a>
+                        <a href={`tel:${biz.phone}`} class="call-btn">
+                            <span>📞</span> Connect Now
+                        </a>
                     </div>
                 ))
             ) : (
                 <p>No active field teams currently listed in this specific layout zone.</p>
             )}
         </div>
-        <a href="/" class="back-link">← Return to Directory Index</a>
+        <a href="/" class="back-link">← Return to Regional Directory Index</a>
     </main>
 
 </body>
