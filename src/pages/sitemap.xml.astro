@@ -1,0 +1,30 @@
+---
+// Automatic search index layout compiler
+import directoryData from '../../seo_directory_data.json';
+
+// Force Astro to render this purely as a static text file, not HTML
+export const partial = true;
+
+const baseUrl = "https://seo-local-directory.vercel.app/";
+const currentDate = new Date().toISOString().split('T')[0];
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://sitemaps.org">
+  <!-- Homepage Entry -->
+  <url>
+    <loc>{baseUrl}/</loc>
+    <lastmod>{currentDate}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Loops through your 32 custom profile pages automatically -->
+  {directoryData.map((page) => (
+    <url>
+      <loc>{baseUrl}/{page.url_slug}</loc>
+      <lastmod>{currentDate}</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+    </url>
+  ))}
+</urlset>
