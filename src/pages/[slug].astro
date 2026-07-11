@@ -1,0 +1,42 @@
+---
+import directoryData from '../../seo_directory_data.json';
+
+export async function getStaticPaths() {
+  return directoryData.map((page) => ({
+    params: { slug: page.url_slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{page.meta_title}</title>
+    <meta name="description" content={page.meta_description}>
+    <style>
+        body { font-family: system-ui, sans-serif; line-height: 1.6; max-width: 750px; margin: 50px auto; padding: 0 20px; color: #333; background: #fff; }
+        main { background: #ffffff; border: 1px solid #e0e0e0; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        main h1 { font-size: 2.2rem; color: #111; margin-top: 0; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        main h2 { font-size: 1.4rem; color: #222; margin-top: 30px; }
+        main p { font-size: 1.05rem; color: #444; }
+        main ul { background: #f7f9fa; padding: 20px 40px; border-radius: 8px; border-left: 4px solid #0066cc; }
+        main li { margin-bottom: 10px; font-size: 1rem; color: #333; }
+        .back-link { display: inline-block; margin-top: 35px; color: #0066cc; text-decoration: none; font-weight: 500; font-size: 1rem; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <Fragment set:html={page.html_content} />
+    </main>
+
+    <a href="/" class="back-link">← Return to Directory Index</a>
+
+</body>
+</html>
