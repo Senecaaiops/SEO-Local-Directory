@@ -1,14 +1,47 @@
 ---
 import directoryData from '../../seo_directory_data.json';
+
 export async function getStaticPaths() {
-  return directoryData.map((page) => ({ params: { slug: page.url_slug }, props: { page } }));
+  return directoryData.map((page) => ({
+    params: { slug: page.url_slug },
+    props: { page },
+  }));
 }
+
 const { page } = Astro.props;
-// JSON-LD Schema data implemented for SEO
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": `Top Vetted ${page.trade} Contractors in ${page.zone}, GA`,
+  "description": page.meta_description,
+  "itemListElement": page.listings.map((biz, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "LocalBusiness",
+      "name": biz.name,
+      "telephone": biz.phone,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": biz.rating,
+        "reviewCount": biz.reviews
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": page.zone,
+        "addressRegion": "GA",
+        "addressCountry": "US"
+      }
+    }
+  }))
+};
 ---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google Analytics Integration Fix - PLACED ABSOLUTE FIRST FOR GOOGLEBOT SCANNER -->
     <script async src="https://googletagmanager.com"></script>
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
@@ -16,14 +49,79 @@ const { page } = Astro.props;
       gtag('js', new Date());
       gtag('config', 'G-1V2WX4K30H');
     </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{page.meta_title}</title>
     <meta name="description" content={page.meta_description}>
-    <!-- Style and content structure included in source -->
+
+    <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --text-main: #475569;
+            --text-dark: #0f172a;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+        }
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 40px 20px; color: var(--text-main); background: var(--bg-main); }
+        main { background: var(--bg-card); border: 1px solid var(--border); padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        main h1 { font-size: 2.25rem; font-weight: 800; color: var(--text-dark); margin-top: 0; padding-bottom: 20px; border-bottom: 2px solid #f1f5f9; letter-spacing: -0.025em; }
+        main h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin-top: 35px; margin-bottom: 15px; }
+        main ul { background: #f8fafc; padding: 24px 24px 24px 40px; border-radius: 10px; border-left: 4px solid #3b82f6; margin: 20px 0; }
+        main li { margin-bottom: 10px; font-size: 1rem; color: #334155; }
+        .listings-section { margin-top: 45px; }
+        .business-card { background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .biz-info h3 { margin: 0 0 4px 0; color: var(--text-dark); font-size: 1.25rem; font-weight: 700; }
+        .badge { background: #dcfce7; color: #166534; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 9999px; margin-left: 10px; display: inline-block; vertical-align: middle; }
+        .stars { color: #eab308; font-weight: 700; font-size: 1rem; }
+        .reviews-count { color: #64748b; font-size: 0.85rem; margin-left: 4px; }
+        .call-btn { display: flex; align-items: center; gap: 8px; background: #2563eb; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
+        .call-btn:hover { background: #1d4ed8; }
+        .claim-wrapper { margin-top: 8px; }
+        .claim-link { font-size: 0.8rem; color: #64748b; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .claim-link:hover { color: #2563eb; text-decoration: underline; }
+        .back-link { display: inline-block; margin-top: 35px; color: var(--accent); text-decoration: none; font-weight: 600; font-size: 1rem; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
     <main>
         <Fragment set:html={page.html_content} />
-        {/* Listings mapped here */}
+        <div class="listings-section">
+            <h2>Available Local Contractors:</h2>
+            {page.listings && page.listings.length > 0 ? (
+                page.listings.map((biz) => (
+                    <div class="business-card">
+                        <div class="biz-info">
+                            <h3>
+                                {biz.name}
+                                {biz.vetted && <span class="badge">🛡️ VETTED PRO</span>}
+                            </h3>
+                            <p style="margin: 0; display: flex; align-items: center;">
+                                <span class="stars">★ {biz.rating}</span> 
+                                <span class="reviews-count">({biz.reviews} verified reviews)</span>
+                            </p>
+                            <div class="claim-wrapper">
+                                <a href={`mailto:leads@seo-local-directory.vercel.app?subject=Listing Claim Request: ${biz.name}`} class="claim-link">
+                                    💼 Own this business? Claim this listing line →
+                                </a>
+                            </div>
+                        </div>
+                        <a href={`tel:${biz.phone}`} class="call-btn">
+                            <span>📞</span> Connect Now
+                        </a>
+                    </div>
+                ))
+            ) : (
+                <p>No active field teams currently listed in this specific layout zone.</p>
+            )}
+        </div>
+        <a href="/" class="back-link">← Return to Directory Index</a>
     </main>
 </body>
 </html>
