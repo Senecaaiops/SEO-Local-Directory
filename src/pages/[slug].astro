@@ -9,6 +9,34 @@ export async function getStaticPaths() {
 }
 
 const { page } = Astro.props;
+
+// Programmatically formats the JSON database list into valid Google Schema data
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": `Top Vetted ${page.trade} Contractors in ${page.zone}, GA`,
+  "description": page.meta_description,
+  "itemListElement": page.listings.map((biz, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "LocalBusiness",
+      "name": biz.name,
+      "telephone": biz.phone,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": biz.rating,
+        "reviewCount": biz.reviews
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": page.zone,
+        "addressRegion": "GA",
+        "addressCountry": "US"
+      }
+    }
+  }))
+};
 ---
 
 <!DOCTYPE html>
@@ -16,8 +44,23 @@ const { page } = Astro.props;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Analytics Integration Fix -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://googletagmanager.com"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1V2WX4K30H');
+    </script>
+
     <title>{page.meta_title}</title>
     <meta name="description" content={page.meta_description}>
+
+    <!-- Injects the structural Schema Markup text block directly for search spiders -->
+    <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+
     <style>
         body { font-family: system-ui, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; background: #fafafa; }
         main { background: #ffffff; border: 1px solid #e2e8f0; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
@@ -26,7 +69,6 @@ const { page } = Astro.props;
         main p { font-size: 1.05rem; color: #475569; }
         main ul { background: #f8fafc; padding: 20px 40px; border-radius: 8px; border-left: 4px solid #3b82f6; }
         main li { margin-bottom: 8px; font-size: 1rem; color: #334155; }
-        
         .listings-section { margin-top: 40px; }
         .business-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .biz-info h3 { margin: 0 0 5px 0; color: #1e3a8a; font-size: 1.2rem; }
@@ -42,10 +84,8 @@ const { page } = Astro.props;
 <body>
 
     <main>
-        <!-- The descriptive SEO content -->
         <Fragment set:html={page.html_content} />
 
-        <!-- The active directory listings area -->
         <div class="listings-section">
             <h2>Available Local Contractors:</h2>
             {page.listings && page.listings.length > 0 ? (
@@ -68,9 +108,8 @@ const { page } = Astro.props;
                 <p>No active field teams currently listed in this specific layout zone.</p>
             )}
         </div>
+        <a href="/" class="back-link">← Return to Directory Index</a>
     </main>
-
-    <a href="/" class="back-link">← Return to Directory Index</a>
 
 </body>
 </html>
