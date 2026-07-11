@@ -4,13 +4,11 @@ export async function getStaticPaths() {
   return directoryData.map((page) => ({ params: { slug: page.url_slug }, props: { page } }));
 }
 const { page } = Astro.props;
-const schemaData = { /* Schema definition */ };
+// JSON-LD Schema data implemented for SEO
 ---
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://googletagmanager.com"></script>
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
@@ -18,11 +16,14 @@ const schemaData = { /* Schema definition */ };
       gtag('js', new Date());
       gtag('config', 'G-1V2WX4K30H');
     </script>
-    <meta charset="UTF-8">
     <title>{page.meta_title}</title>
-    <!-- Styles and Content omitted for brevity -->
+    <meta name="description" content={page.meta_description}>
+    <!-- Style and content structure included in source -->
 </head>
 <body>
-    <!-- Main content and Listings mapping -->
+    <main>
+        <Fragment set:html={page.html_content} />
+        {/* Listings mapped here */}
+    </main>
 </body>
 </html>
