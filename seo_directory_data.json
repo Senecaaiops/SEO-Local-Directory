@@ -67,8 +67,8 @@
       {"name": "McDonough Roofing Company", "phone": "(770) 954-1234", "rating": 4.9, "reviews": 142, "vetted": true}, 
       {"name": "Atlanta B2B Roofing Systems", "phone": "(404) 555-0222", "rating": 4.7, "reviews": 38, "vetted": true} 
     ]
-  },
-  {
+  }
+    {
     "type": "Commercial",
     "zone": "Midland Industrial Park",
     "trade": "Industrial HVAC",
@@ -133,4 +133,3 @@
       {"name": "Atlanta Heavy Mechanical Systems", "phone": "(404) 555-0344", "rating": 4.9, "reviews": 40, "vetted": true} 
     ]
   }
-
