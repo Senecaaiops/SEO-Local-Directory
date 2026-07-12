@@ -1,5 +1,5 @@
 ---
-iimport directoryData from '../../../seo_directory_data.json';
+import directoryData from '../../../seo_directory_data.json';
 
 export async function getStaticPaths() {
   const residentialTrades = [...new Set(directoryData.filter(p => p.type === "Residential").map(p => p.trade))];
