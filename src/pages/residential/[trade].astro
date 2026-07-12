@@ -1,30 +1,250 @@
-<!-- Replace your Residential loop with this matching upgrade -->
-{directoryData.filter(p => p.type === "Residential").map((page) => {
-    const count = page.listings ? page.listings.length : 0;
-    const vettedCount = page.listings ? page.listings.filter(l => l.vetted).length : 0;
+---
+import directoryData from '../../seo_directory_data.json';
+
+export async function getStaticPaths() {
+  const residentialTrades = [...new Set(directoryData.filter(p => p.type === "Residential").map(p => p.trade))];
+  return residentialTrades.map((tradeName) => {
+    const slug = tradeName.toLowerCase().replace(/\s+/g, '-');
+    return { params: { trade: slug }, props: { tradeName } };
+  });
+}
+
+const { tradeName } = Astro.props;
+const localMatches = directoryData.filter(p => p.type === "Residential" && p.trade === tradeName);
+
+const dynamicMetaTitle = `Best ${tradeName} Contractors Near Me - Verified Local Options`;
+const dynamicMetaDescription = `Find vetted neighborhood providers specializing in residential ${tradeName.toLowerCase()} solutions. Access reviews and call buttons.`;
+
+const combinedListings = localMatches.flatMap(p => 
+  (p.listings || []).map(biz => ({ ...biz, associatedZone: p.zone }))
+);
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": `Vetted Residential ${tradeName} Contractors`,
+  "description": dynamicMetaDescription,
+  "itemListElement": combinedListings.map((biz, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "LocalBusiness",
+      "name": biz.name,
+      "telephone": biz.phone,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": biz.rating,
+        "reviewCount": biz.reviews
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": biz.associatedZone,
+        "addressRegion": "GA",
+        "addressCountry": "US"
+      }
+    }
+  }))
+};
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://googletagmanager.com"></script>
+    <script is:inline>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-1V2WX4K30H');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{dynamicMetaTitle}</title>
+    <meta name="description" content={dynamicMetaDescription}>
+    <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
     
-    return (
-        <div class="card">
-            <div>
-                <span class="tag tag-residential">Residential</span>
-                <h3>{page.trade}</h3>
-                <p>Connecting residential property owners and neighborhood association managers with certified crews in <strong>{page.zone}</strong>.</p>
-                
-                <!-- MATCHING RESIDENTIAL METRICS BADGE -->
-                <div style="margin: 12px 0; padding: 10px; background: var(--bg-main); border-radius: 8px; font-size: 0.85rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <span>📋 Active Field Crews:</span>
-                        <strong>{count} Companies</strong>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --text-main: #475569;
+            --text-dark: #0f172a;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-main);
+            background: var(--bg-main);
+        }
+        main {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        main h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-top: 0;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f1f5f9;
+            letter-spacing: -0.025em;
+        }
+        .intro-block {
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: #334155;
+        }
+        .zone-group-title {
+            background: #fdf2f8;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            color: #9d174d;
+            font-weight: 700;
+            margin: 30px 0 15px 0;
+            border-left: 4px solid #9d174d;
+        }
+        .listings-section {
+            margin-top: 25px;
+        }
+        .business-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .biz-info h3 {
+            margin: 0 0 4px 0;
+            color: var(--text-dark);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .badge {
+            background: #dcfce7;
+            color: #166534;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            margin-left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .stars {
+            color: #eab308;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .reviews-count {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-left: 4px;
+        }
+        .call-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2563eb;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        .call-btn:hover {
+            background: #1d4ed8;
+        }
+        .claim-wrapper {
+            margin-top: 8px;
+        }
+        .claim-link {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .claim-link:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 35px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Vetted Neighborhood {tradeName} Specialists</h1>
+        
+        <p class="intro-block">
+            Browse fully certified and vetted residential field crews specializing in <strong>{tradeName.toLowerCase()}</strong> solutions. Select from specialized local teams prepared to handle your neighborhood requirements.
+        </p>
+
+        <div class="listings-section">
+            {localMatches.map((locationBlock) => (
+                <div>
+                    <div class="zone-group-title">
+                        🏡 Subdivision Community: {locationBlock.zone}
                     </div>
-                    <div style="display: flex; justify-content: space-between; color: #9d174d;">
-                        <span>🛡️ Vetted Providers:</span>
-                        <strong>{vettedCount} Verified</strong>
-                    </div>
+                    
+                    {locationBlock.listings && locationBlock.listings.length > 0 ? (
+                        locationBlock.listings.map((biz) => (
+                            <div class="business-card">
+                                <div class="biz-info">
+                                    <h3>
+                                        {biz.name}
+                                        {biz.vetted && <span class="badge">🛡️ VETTED PRO</span>}
+                                    </h3>
+                                    <p style="margin: 0; display: flex; align-items: center;">
+                                        <span class="stars">★ {biz.rating}</span>
+                                        <span class="reviews-count">({biz.reviews} verified reviews)</span>
+                                    </p>
+                                    <div class="claim-wrapper">
+                                        <a href={`mailto:leads@seo-local-directory.vercel.app?subject=Listing Claim Request: ${biz.name}`} class="claim-link">
+                                            💼 Own this business? Claim this listing line →
+                                        </a>
+                                    </div>
+                                </div>
+                                <a href={`tel:${biz.phone}`} class="call-btn">
+                                    <span>📞</span> Connect Now
+                                </a>
+                            </div>
+                        ))
+                    ) : (
+                        <p style="padding-left: 16px; font-style: italic;">No active field teams currently listed in this specific layout zone.</p>
+                    )}
                 </div>
-            </div>
-            <a href={`/${page.url_slug}`} class="btn" data-trade={page.trade} data-zone={page.zone} data-type="Residential">
-                Browse Vetted Contractors →
-            </a>
+            ))}
         </div>
-    )
-})}
+
+        <a href="/" class="back-link">← Return to Directory Index</a>
+    </main>
+</body>
+</html>
