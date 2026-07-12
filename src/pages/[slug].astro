@@ -1,6 +1,6 @@
 ---
 import directoryData from '../../seo_directory_data.json';
-
+---
 export async function getStaticPaths() {
   return directoryData.map((page) => ({
     params: { slug: page.url_slug },
