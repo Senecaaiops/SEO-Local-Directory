@@ -39,7 +39,7 @@ import directoryData from '../../seo_directory_data.json';
         }
         header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
             padding-bottom: 30px;
             border-bottom: 1px solid var(--border);
         }
@@ -55,6 +55,30 @@ import directoryData from '../../seo_directory_data.json';
             font-size: 1.15rem;
             max-width: 700px;
             margin: 0 auto;
+        }
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto 40px auto;
+            text-align: center;
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-dark);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        .section-block.is-hidden {
+            display: none;
         }
         .section-title {
             font-size: 1.5rem;
@@ -80,6 +104,9 @@ import directoryData from '../../seo_directory_data.json';
             flex-direction: column;
             justify-content: space-between;
             transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card.is-hidden {
+            display: none !important;
         }
         .card:hover {
             transform: translateY(-2px);
@@ -128,6 +155,19 @@ import directoryData from '../../seo_directory_data.json';
         .btn:hover {
             background: var(--accent-hover);
         }
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-card);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 1.1rem;
+        }
+        .no-results.is-visible {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -136,91 +176,145 @@ import directoryData from '../../seo_directory_data.json';
         <p class="subtitle">The trusted procurement hub for localized asset management, commercial facility contractors, and vetted residential subdivision field crews.</p>
     </header>
 
-    <h2 class="section-title">🏢 Commercial Logistics & Industrial Asset Zones</h2>
-    <div class="grid" style="margin-bottom: 50px;">
-        {(() => {
-            const uniqueCommercialTrades = directoryData
-                .filter(p => p.type === "Commercial")
-                .filter((value, index, self) => 
-                    self.findIndex(t => t.trade === value.trade) === index
-                );
-
-            return uniqueCommercialTrades.map((page) => {
-                const allMatchingRecords = directoryData.filter(p => p.type === "Commercial" && p.trade === page.trade);
-                const totalCount = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.length : 0), 0);
-                const totalVetted = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.filter(l => l.vetted).length : 0), 0);
-                const cleanMasterSlug = page.trade.toLowerCase().replace(/\s+/g, '-');
-
-                return (
-                    <div class="card">
-                        <div>
-                            <span class="tag tag-commercial">Commercial</span>
-                            <h3>{page.trade} Services</h3>
-                            <p>Connecting asset managers with certified field professionals across all regional industrial parks.</p>
-                            
-                            <div style="margin: 12px 0; padding: 10px; background: var(--bg-main); border-radius: 8px; font-size: 0.85rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                    <span>📋 Total Contractors:</span>
-                                    <strong>{totalCount} Teams Available</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; color: #16a34a;">
-                                    <span>🛡️ Vetted Providers:</span>
-                                    <strong>{totalVetted} Verified Across Network</strong>
-                                </div>
-                            </div>
-                        </div>
-                        <a href={`/commercial/${cleanMasterSlug}`} class="btn" data-trade={page.trade} data-type="Commercial">
-                            Browse Vetted Contractors →
-                        </a>
-                    </div>
-                )
-            });
-        })()}
+    <!-- Interactive Search Bar -->
+    <div class="search-container">
+        <input type="text" id="directorySearch" class="search-input" placeholder="Search trades (e.g., Roofing, HVAC, Plumbing)..." aria-label="Search directory categories" />
     </div>
 
-    <h2 class="section-title">🏡 Premium Subdivisions & Neighborhood Clusters</h2>
-    <div class="grid">
-        {(() => {
-            const uniqueResidentialTrades = directoryData
-                .filter(p => p.type === "Residential")
-                .filter((value, index, self) => 
-                    self.findIndex(t => t.trade === value.trade) === index
-                );
+    <!-- Empty State Informational Banner -->
+    <div id="emptyState" class="no-results">
+        🔍 No matching service trades found. Try searching for another keyword.
+    </div>
+    <div class="section-block" id="commercialSection">
+        <h2 class="section-title">🏢 Commercial Logistics & Industrial Asset Zones</h2>
+        <div class="grid" style="margin-bottom: 50px;">
+            {(() => {
+                const uniqueCommercialTrades = directoryData
+                    .filter(p => p.type === "Commercial")
+                    .filter((value, index, self) => 
+                        self.findIndex(t => t.trade === value.trade) === index
+                    );
 
-            return uniqueResidentialTrades.map((page) => {
-                const allMatchingRecords = directoryData.filter(p => p.type === "Residential" && p.trade === page.trade);
-                const totalCount = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.length : 0), 0);
-                const totalVetted = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.filter(l => l.vetted).length : 0), 0);
-                const cleanMasterSlug = page.trade.toLowerCase().replace(/\s+/g, '-');
+                return uniqueCommercialTrades.map((page) => {
+                    const allMatchingRecords = directoryData.filter(p => p.type === "Commercial" && p.trade === page.trade);
+                    const totalCount = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.length : 0), 0);
+                    const totalVetted = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.filter(l => l.vetted).length : 0), 0);
+                    const cleanMasterSlug = page.trade.toLowerCase().replace(/\s+/g, '-');
 
-                return (
-                    <div class="card">
-                        <div>
-                            <span class="tag tag-residential">Residential</span>
-                            <h3>{page.trade} Services</h3>
-                            <p>Connecting residential property owners and HOA managers with local certified crews.</p>
-                            
-                            <div style="margin: 12px 0; padding: 10px; background: var(--bg-main); border-radius: 8px; font-size: 0.85rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                    <span>📋 Total Contractors:</span>
-                                    <strong>{totalCount} Teams Available</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; color: #9d174d;">
-                                    <span>🛡️ Vetted Providers:</span>
-                                    <strong>{totalVetted} Verified Across Network</strong>
+                    return (
+                        <div class="card" data-search-name={page.trade.toLowerCase()}>
+                            <div>
+                                <span class="tag tag-commercial">Commercial</span>
+                                <h3>{page.trade} Services</h3>
+                                <p>Connecting asset managers with certified field professionals across all regional industrial parks.</p>
+                                
+                                <div style="margin: 12px 0; padding: 10px; background: var(--bg-main); border-radius: 8px; font-size: 0.85rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span>📋 Total Contractors:</span>
+                                        <strong>{totalCount} Teams Available</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; color: #16a34a;">
+                                        <span>🛡️ Vetted Providers:</span>
+                                        <strong>{totalVetted} Verified Across Network</strong>
+                                    </div>
                                 </div>
                             </div>
+                            <a href={`/commercial/${cleanMasterSlug}`} class="btn" data-trade={page.trade} data-type="Commercial">
+                                Browse Vetted Contractors →
+                            </a>
                         </div>
-                        <a href={`/residential/${cleanMasterSlug}`} class="btn" data-trade={page.trade} data-type="Residential">
-                            Browse Vetted Contractors →
-                        </a>
-                    </div>
-                )
-            });
-        })()}
+                    )
+                });
+            })()}
+        </div>
+    </div>
+
+    <div class="section-block" id="residentialSection">
+        <h2 class="section-title">🏡 Premium Subdivisions & Neighborhood Clusters</h2>
+        <div class="grid">
+            {(() => {
+                const uniqueResidentialTrades = directoryData
+                    .filter(p => p.type === "Residential")
+                    .filter((value, index, self) => 
+                        self.findIndex(t => t.trade === value.trade) === index
+                    );
+
+                return uniqueResidentialTrades.map((page) => {
+                    const allMatchingRecords = directoryData.filter(p => p.type === "Residential" && p.trade === page.trade);
+                    const totalCount = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.length : 0), 0);
+                    const totalVetted = allMatchingRecords.reduce((sum, current) => sum + (current.listings ? current.listings.filter(l => l.vetted).length : 0), 0);
+                    const cleanMasterSlug = page.trade.toLowerCase().replace(/\s+/g, '-');
+
+                    return (
+                        <div class="card" data-search-name={page.trade.toLowerCase()}>
+                            <div>
+                                <span class="tag tag-residential">Residential</span>
+                                <h3>{page.trade} Services</h3>
+                                <p>Connecting residential property owners and HOA managers with local certified crews.</p>
+                                
+                                <div style="margin: 12px 0; padding: 10px; background: var(--bg-main); border-radius: 8px; font-size: 0.85rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span>📋 Total Contractors:</span>
+                                        <strong>{totalCount} Teams Available</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; color: #9d174d;">
+                                        <span>🛡️ Vetted Providers:</span>
+                                        <strong>{totalVetted} Verified Across Network</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href={`/residential/${cleanMasterSlug}`} class="btn" data-trade={page.trade} data-type="Residential">
+                                Browse Vetted Contractors →
+                            </a>
+                        </div>
+                    )
+                });
+            })()}
+        </div>
     </div>
 
     <script is:inline>
+        // 1. Client-Side Search Logic
+        const searchInput = document.getElementById('directorySearch');
+        const cards = document.querySelectorAll('.card');
+        const commercialSection = document.getElementById('commercialSection');
+        const residentialSection = document.getElementById('residentialSection');
+        const emptyState = document.getElementById('emptyState');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            let visibleCommercialCount = 0;
+            let visibleResidentialCount = 0;
+
+            cards.forEach(card => {
+                const tradeName = card.getAttribute('data-search-name') || '';
+                const isCommercial = card.querySelector('.tag').classList.contains('tag-commercial');
+
+                if (tradeName.includes(query)) {
+                    card.classList.remove('is-hidden');
+                    if (isCommercial) visibleCommercialCount++;
+                    else visibleResidentialCount++;
+                } else {
+                    card.classList.add('is-hidden');
+                }
+            });
+
+            // Hide/Show section parent headings dynamically
+            if (visibleCommercialCount === 0) commercialSection.classList.add('is-hidden');
+            else commercialSection.classList.remove('is-hidden');
+
+            if (visibleResidentialCount === 0) residentialSection.classList.add('is-hidden');
+            else residentialSection.classList.remove('is-hidden');
+
+            // Handle total empty slate state visibility
+            if (visibleCommercialCount === 0 && visibleResidentialCount === 0) {
+                emptyState.classList.add('is-visible');
+            } else {
+                emptyState.classList.remove('is-visible');
+            }
+        });
+
+        // 2. Click Logging Automation
         document.addEventListener('click', (event) => {
             const button = event.target.closest('.btn');
             if (!button) return;
