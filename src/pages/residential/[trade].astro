@@ -1,0 +1,30 @@
+<!-- Replace your Residential loop with this matching upgrade -->
+{directoryData.filter(p => p.type === "Residential").map((page) => {
+    const count = page.listings ? page.listings.length : 0;
+    const vettedCount = page.listings ? page.listings.filter(l => l.vetted).length : 0;
+    
+    return (
+        <div class="card">
+            <div>
+                <span class="tag tag-residential">Residential</span>
+                <h3>{page.trade}</h3>
+                <p>Connecting residential property owners and neighborhood association managers with certified crews in <strong>{page.zone}</strong>.</p>
+                
+                <!-- MATCHING RESIDENTIAL METRICS BADGE -->
+                <div style="margin: 12px 0; padding: 10px; background: var(--bg-main); border-radius: 8px; font-size: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>📋 Active Field Crews:</span>
+                        <strong>{count} Companies</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; color: #9d174d;">
+                        <span>🛡️ Vetted Providers:</span>
+                        <strong>{vettedCount} Verified</strong>
+                    </div>
+                </div>
+            </div>
+            <a href={`/${page.url_slug}`} class="btn" data-trade={page.trade} data-zone={page.zone} data-type="Residential">
+                Browse Vetted Contractors →
+            </a>
+        </div>
+    )
+})}
