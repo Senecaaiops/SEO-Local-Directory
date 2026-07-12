@@ -143,7 +143,14 @@ import directoryData from '../../seo_directory_data.json';
                     <h3>{page.trade}</h3>
                     <p>Serving asset managers and facility operators throughout the high-density corridor around <strong>{page.zone}</strong>.</p>
                 </div>
-                <a href={`/${page.url_slug}`} class="btn">Browse Vetted Contractors →</a>
+                <!-- Added data attributes for GA tracking -->
+                <a href={`/${page.url_slug}`} 
+                   class="btn" 
+                   data-trade={page.trade} 
+                   data-zone={page.zone} 
+                   data-type="Commercial">
+                   Browse Vetted Contractors →
+                </a>
             </div>
         ))}
     </div>
@@ -157,9 +164,40 @@ import directoryData from '../../seo_directory_data.json';
                     <h3>{page.trade}</h3>
                     <p>Connecting residential property owners and neighborhood association managers with certified crews in <strong>{page.zone}</strong>.</p>
                 </div>
-                <a href={`/${page.url_slug}`} class="btn">Browse Vetted Contractors →</a>
+                <!-- Added data attributes for GA tracking -->
+                <a href={`/${page.url_slug}`} 
+                   class="btn" 
+                   data-trade={page.trade} 
+                   data-zone={page.zone} 
+                   data-type="Residential">
+                   Browse Vetted Contractors →
+                </a>
             </div>
         ))}
     </div>
+
+    <!-- Script handles dynamic outbound link click capturing safely inside Astro -->
+    <script is:inline>
+        document.addEventListener('click', (event) => {
+            const button = event.target.closest('.btn');
+            if (!button) return;
+
+            const trade = button.getAttribute('data-trade');
+            const zone = button.getAttribute('data-zone');
+            const sectorType = button.getAttribute('data-type');
+            const destinationUrl = button.getAttribute('href');
+
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'directory_click', {
+                    'event_category': 'Outbound Navigation',
+                    'event_label': trade + ' - ' + zone,
+                    'sector_type': sectorType,
+                    'trade_name': trade,
+                    'target_zone': zone,
+                    'destination_url': destinationUrl
+                });
+            }
+        });
+    </script>
 </body>
 </html>
